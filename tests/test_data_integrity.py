@@ -64,9 +64,15 @@ def test_descriptive_names_no_duplicates():
     lf_desc = scan_rfsd(year=2024, descriptive=True)
     schema_desc = lf_desc.collect_schema()
     assert "PL_revenue" in schema_desc
-    assert "B_total_assets" in schema_desc
-    assert "B_borrowings_longterm" in schema_desc
-    assert "B_borrowings_shortterm" in schema_desc
+    assert "B_assets" in schema_desc
+    assert "B_fin_invest_noncurrent" in schema_desc
+    assert "B_fin_invest_current" in schema_desc
+    assert "B_provision_liab_longterm" in schema_desc
+    assert "B_provision_liab_shortterm" in schema_desc
+    assert "B_other_liab_longterm" in schema_desc
+    assert "B_other_liab_shortterm" in schema_desc
+    assert "PU_designated_inflow" in schema_desc
+    assert "PU_designated_outflow" in schema_desc
 
 
 def test_strict_year_type_validation_no_implicit_casting():
