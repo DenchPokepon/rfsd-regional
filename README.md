@@ -1,5 +1,8 @@
 # Russian Financial Statements Database (RFSD) - Firm-Level Analytics
 
+Рабочие документы: [план и статусы](docs/plan.md), [правила выборки и показателей](docs/analysis_rules.md).
+Правила зафиксированы; аналитические скрипты и прежние отчёты ещё предстоит привести к ним по плану.
+
 Laconic, flexible, state-of-the-art working environment for high-throughput empirical corporate finance and regional macro research based on **[RFSD (Russian Financial Statements Database)](https://github.com/irlcode/RFSD)** (2011–2025).
 
 Built with **`uv`**, **Python 3.11**, and **Polars** as the native lazy query engine. Zero-bloat, direct Apache Parquet scanning with Hive partition pruning, predicate pushdown, and projection pushdown.

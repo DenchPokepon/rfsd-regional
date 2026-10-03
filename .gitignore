@@ -3,9 +3,8 @@
 venv/
 env/
 
-# Data directory: keep descriptive_names_dict.csv, ignore large datasets and cache
-data/RFSD/
-data/.cache/
+# Local source data, downloads and cache
+/data/
 *.parquet
 *.parquet.metadata
 
