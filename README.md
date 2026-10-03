@@ -71,6 +71,16 @@ uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py
 
 Три скрипта сохраняют CSV и Parquet в новый каталог `outputs/runs/<время UTC>-<анализ>/`. `--output-dir` задаёт свой новый каталог; существующий каталог не перезаписывается. Все успешные запуски индексируются автоматически. Необязательный `--decisions data/decisions.csv` читает решения `inn,year,action,reason,source`: `review` не меняет суммы, `exclude` исключает ИНН только за указанный год из очищенного варианта. Без файла нет ручных исключений. Перед анализом новых файлов запускайте проверку контрольных сумм и `check_data.py`.
 
+## Задание коллегам
+
+[Короткая инструкция](docs/audit_task.md) · [Распределение, Excel и охват](docs/audit_packet.md).
+
+```sh
+uv run --locked python scripts/prepare_audit.py --audit-run outputs/runs/20261003-batch3-audit --figures-run outputs/runs/20261003-batch5-figures-v2
+```
+
+Скрипт на Polars воспроизводит списки и шаблоны ответа CSV, историю ИНН, отраслевые таблицы, копии задания и графиков. Отдельные Excel для пяти коллег лежат в сохранённом комплекте; Python-команда создаёт CSV/Parquet. Ответы коллег сохраняйте отдельно от индексированных исходных выгрузок.
+
 ## Общие графики
 
 После проверки и сравнения укажите каталоги сохранённых запусков:
@@ -94,6 +104,6 @@ uv run --locked pytest -q -m integration
 
 Словарь названий в `src/firm_level/descriptive_names.csv` — метаданные схемы, не отчётность компаний. Он перенесён из прежнего проекта и адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv).
 
-[Задание](docs/drafts/audit_task.md) и [старая записка](docs/drafts/rfsd_vs_rosstat_report.md) сохранены как архивные черновики с предупреждением. Актуальны [диагностика RFSD](docs/data_audit.md), [справочное сравнение с Росстатом](docs/rfsd_vs_rosstat.md) и [общие графики](docs/figures.md). Сверка кандидатов с первичной отчётностью и финальная редакция двух документов — следующие шаги плана. Старые выгрузки и графики сохранены отдельно с пометкой об ошибках; ссылки — в [индексе](docs/results.md).
+Актуальны [задание коллегам](docs/audit_task.md), [диагностика RFSD](docs/data_audit.md), [справочное сравнение с Росстатом](docs/rfsd_vs_rosstat.md) и [общие графики](docs/figures.md). Старые документы в `docs/drafts/` сохранены с предупреждением. Сверку кандидатов по первичной отчётности выполняют коллеги; краткая итоговая редакция анализа — следующий шаг плана. Все комплекты — в [индексе](docs/results.md).
 
 Источник: [RFSD — Bondarkov, Ledenev, Skougarevskiy](https://github.com/irlcode/RFSD), CC BY 4.0. Финансовая отчётность неконсолидированная; юридический адрес не определяет место производства.
