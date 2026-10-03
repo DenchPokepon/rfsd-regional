@@ -2,7 +2,7 @@
 
 Python 3.11, uv, Parquet. `scan_rfsd()` возвращает обычный LazyFrame без скрытых фильтров; можно также использовать `pl.scan_parquet()` напрямую.
 
-[План и статусы](docs/plan.md) · [Правила расчётов](docs/analysis_rules.md)
+[План и статусы](docs/plan.md) · [Правила расчётов](docs/analysis_rules.md) · [Проверка данных](docs/data_audit.md)
 
 ## Установка и данные
 
@@ -60,11 +60,12 @@ named = scan_rfsd(year=2024, descriptive=True)
 
 ```sh
 uv run --locked python scripts/check_data.py --years 2024
+uv run --locked python scripts/check_data.py
 uv run --locked python scripts/dfo_analysis.py --year 2024 --top-sectors 15 --top-firms 10
 uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py
 ```
 
-- `check_data.py`: ключи ИНН–год, покрытие, флаги; без `--years` проверяет все скачанные годы. Результаты в `outputs/checks/`.
+- `check_data.py`: проверка SHA-256 и ключей, покрытие, влияние очистки, формы, крупные аномалии и динамика на сопоставимых фирмах. Без `--years` проверяет все скачанные годы; несоседние годы не соединяет. Результаты в `outputs/checks/` (CSV и Parquet), состав файлов — в [записке](docs/data_audit.md). `--top 20` задаёт число кандидатов на причину и год; `--trace-inn 2526003992` добавляет историю указанного ИНН. Кандидаты сами по себе не меняют выборку.
 - `dfo_analysis.py`: агрегаты по классам ОКВЭД, регионам и рабочим группам, крупнейшие фирмы. Выгружает базовый и очищенный варианты в `outputs/dfo/`.
 - `rfsd_rosstat_pipeline.py`: номинальные таблицы сравнения с ВРП и ВДС, без кеша и генерации выводов. Требует все годы RFSD 2011–2025, пишет в `outputs/comparison/`. Полное ВРП сохраняется, несопоставимые отрасли и отсутствующие годы остаются с пропусками. Отношение выручки к ВДС не является процентом покрытия.
 
@@ -83,6 +84,6 @@ uv run --locked pytest -q -m integration
 
 Словарь названий в `src/firm_level/descriptive_names.csv` — метаданные схемы, не отчётность компаний. Он перенесён из прежнего проекта и адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv).
 
-[Задание](docs/drafts/audit_task.md) и [аналитическая записка](docs/drafts/rfsd_vs_rosstat_report.md) пока сохранены как архивные черновики с предупреждением. Их обновление, полный аудит и новые графики — следующие шаги плана. Прежние файлы непосредственно в `outputs/` не являются результатами новых скриптов.
+[Задание](docs/drafts/audit_task.md) и [аналитическая записка](docs/drafts/rfsd_vs_rosstat_report.md) пока сохранены как архивные черновики с предупреждением. Автоматическая [диагностика RFSD](docs/data_audit.md) завершена; сверка кандидатов с первичной отчётностью, обновление двух документов и графики — следующие шаги плана. Прежние файлы непосредственно в `outputs/` не являются результатами новых скриптов.
 
 Источник: [RFSD — Bondarkov, Ledenev, Skougarevskiy](https://github.com/irlcode/RFSD), CC BY 4.0. Финансовая отчётность неконсолидированная; юридический адрес не определяет место производства.
