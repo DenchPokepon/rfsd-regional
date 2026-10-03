@@ -23,7 +23,7 @@ uv run --locked python scripts/download_data.py --source all --verify-only
 
 Исходники лежат в `data/`, результаты — в `outputs/runs/`; оба каталога исключены из Git. Каждый успешный аналитический запуск сохраняется отдельно и регистрируется в `outputs/index.json`: параметры, версии источников и SHA-256 файлов. Другой каталог исходников можно задать переменной `RFSD_DATA_DIR` (содержит `RFSD/` и файлы Росстата). Для `scan_rfsd(data_dir=...)` передаётся именно каталог с партициями `year=...`.
 
-Основная зависимость — только Polars. Группа `download` добавляет Hugging Face, `analysis` — чтение Excel, `dev` — тесты. Для одних запросов достаточно `uv sync --locked --no-default-groups`.
+Основная зависимость — только Polars. Группа `download` добавляет Hugging Face, `analysis` — чтение Excel, `plots` — Matplotlib, `dev` — тесты. Для одних запросов достаточно `uv sync --locked --no-default-groups`.
 
 ## Обычные запросы
 
@@ -71,6 +71,16 @@ uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py
 
 Три скрипта сохраняют CSV и Parquet в новый каталог `outputs/runs/<время UTC>-<анализ>/`. `--output-dir` задаёт свой новый каталог; существующий каталог не перезаписывается. Все успешные запуски индексируются автоматически. Необязательный `--decisions data/decisions.csv` читает решения `inn,year,action,reason,source`: `review` не меняет суммы, `exclude` исключает ИНН только за указанный год из очищенного варианта. Без файла нет ручных исключений. Перед анализом новых файлов запускайте проверку контрольных сумм и `check_data.py`.
 
+## Общие графики
+
+После проверки и сравнения укажите каталоги сохранённых запусков:
+
+```sh
+uv run --locked --group plots python scripts/plot_results.py --audit-run outputs/runs/20261003-batch3-audit --comparison-run outputs/runs/20261003-batch4-comparison-v2
+```
+
+Четыре PNG/SVG и исходные таблицы сохраняются в новый индексируемый каталог. Входные хеши, ревизия RFSD, ручные исключения и общие суммы должны совпадать. [Графики и пояснения](docs/figures.md). При ручной очистке сначала пересчитайте оба входных запуска с одним `--decisions`.
+
 ## Проверки и воспроизводимость
 
 ```sh
@@ -84,6 +94,6 @@ uv run --locked pytest -q -m integration
 
 Словарь названий в `src/firm_level/descriptive_names.csv` — метаданные схемы, не отчётность компаний. Он перенесён из прежнего проекта и адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv).
 
-[Задание](docs/drafts/audit_task.md) и [старая записка](docs/drafts/rfsd_vs_rosstat_report.md) сохранены как архивные черновики с предупреждением. Актуальны [диагностика RFSD](docs/data_audit.md) и [справочное сравнение с Росстатом](docs/rfsd_vs_rosstat.md). Сверка кандидатов с первичной отчётностью, графики и финальная редакция двух документов — следующие шаги плана. Старые выгрузки и графики сохранены отдельно с пометкой об ошибках; ссылки — в [индексе](docs/results.md).
+[Задание](docs/drafts/audit_task.md) и [старая записка](docs/drafts/rfsd_vs_rosstat_report.md) сохранены как архивные черновики с предупреждением. Актуальны [диагностика RFSD](docs/data_audit.md), [справочное сравнение с Росстатом](docs/rfsd_vs_rosstat.md) и [общие графики](docs/figures.md). Сверка кандидатов с первичной отчётностью и финальная редакция двух документов — следующие шаги плана. Старые выгрузки и графики сохранены отдельно с пометкой об ошибках; ссылки — в [индексе](docs/results.md).
 
 Источник: [RFSD — Bondarkov, Ledenev, Skougarevskiy](https://github.com/irlcode/RFSD), CC BY 4.0. Финансовая отчётность неконсолидированная; юридический адрес не определяет место производства.
