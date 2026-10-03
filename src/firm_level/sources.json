@@ -1,0 +1,83 @@
+{
+  "verified_on": "2026-10-03",
+  "rfsd": {
+    "repo_id": "irlspbru/RFSD",
+    "revision": "bde9b8b129a8be582b66de4e30ed79c9187a8515",
+    "files": {
+      "RFSD/year=2011/part-0.parquet": {
+        "sha256": "70c60a68973b81a504a86607137434800658a19129a265ec98920402a0bec501",
+        "bytes": 286156933
+      },
+      "RFSD/year=2012/part-0.parquet": {
+        "sha256": "d87c8d34d8799c6315f95651722ea17c6829a6ef0d84c3966f23f0706719b2db",
+        "bytes": 366391239
+      },
+      "RFSD/year=2013/part-0.parquet": {
+        "sha256": "32362cc07507347f583844b14978bc5c63b6aab1b702c598df1f332182166023",
+        "bytes": 452464560
+      },
+      "RFSD/year=2014/part-0.parquet": {
+        "sha256": "2afcf4a77b9918eb8271e2811e24351928508e66de0ea09df29b1f9fc34d223c",
+        "bytes": 524049741
+      },
+      "RFSD/year=2015/part-0.parquet": {
+        "sha256": "3880da77bedede1c610fa5d01f24ad8e1a9374cfef4d3f9661b18b4fd3dcb8a1",
+        "bytes": 543025302
+      },
+      "RFSD/year=2016/part-0.parquet": {
+        "sha256": "d26ccad2bc0fb6af20a93367fa8b36a2cb5b7dd2d3939d24f80c9324a32ecedd",
+        "bytes": 554613885
+      },
+      "RFSD/year=2017/part-0.parquet": {
+        "sha256": "8e6a506b0040ce1ff1c58f878f972ffbcaa371b34fddc898e928c3ede0417043",
+        "bytes": 556609925
+      },
+      "RFSD/year=2018/part-0.parquet": {
+        "sha256": "5ad3c80caa998985711e2f0cccc081b68926287f06352c72f468a2aacc05e35b",
+        "bytes": 555291548
+      },
+      "RFSD/year=2019/part-0.parquet": {
+        "sha256": "e0447bd56f3a01f208ff4cafe0328613986b42933405dbc0265fd5e49d432f3b",
+        "bytes": 584368545
+      },
+      "RFSD/year=2020/part-0.parquet": {
+        "sha256": "19dfbc03b3cd969349050c5ec2b04da1738d9387e162f06894ebea13aef14560",
+        "bytes": 561484446
+      },
+      "RFSD/year=2021/part-0.parquet": {
+        "sha256": "9c19741d3c85428e79d5f9eedd08aa0422fedfef6bdc0a1c02b70e4d735e6f7f",
+        "bytes": 547323604
+      },
+      "RFSD/year=2022/part-0.parquet": {
+        "sha256": "c46ea7a8f7a6a39e14769684815d11c386546492e929d888f24b2fdf2016b3ab",
+        "bytes": 544123473
+      },
+      "RFSD/year=2023/part-0.parquet": {
+        "sha256": "25bd0b729b95f66a172507d7f5c235423779c2eed09efd992e11478f4d492beb",
+        "bytes": 543814694
+      },
+      "RFSD/year=2024/part-0.parquet": {
+        "sha256": "c1537cab18e957d77511de7ab924d17836d21f85383183175fd4d1753634ccd9",
+        "bytes": 545012309
+      },
+      "RFSD/year=2025/part-0.parquet": {
+        "sha256": "e26b5f7b1e3739c3c16ef80d9141d78e9020f77b4f642da43690db7dcc8de84a",
+        "bytes": 533691331
+      }
+    }
+  },
+  "rosstat": {
+    "VRP_s1998.xlsx": {
+      "url": "https://rosstat.gov.ru/storage/mediabank/VRP_s1998.xlsx",
+      "sha256": "85c40007ed1712b543119a768260d39b386f707034222d4725fd7ee217e26ddc"
+    },
+    "VRP_OKVED2_s_2016.xlsx": {
+      "url": "https://rosstat.gov.ru/storage/mediabank/VRP_OKVED2_s_2016.xlsx",
+      "sha256": "2b45e52a912177c40632ccc10c605ff7c25256b66919ad553ca7e4c33aff4f7b"
+    },
+    "IVBO_sub_RF_07-2026.xlsx": {
+      "url": "https://rosstat.gov.ru/storage/mediabank/IVBO_sub_RF_07-2026.xlsx",
+      "sha256": "8ca9e001a820fa19df4353585cc2f44ad35add76deaec8288c1797cd0dbfdfad"
+    }
+  }
+}

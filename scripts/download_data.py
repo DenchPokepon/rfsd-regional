@@ -1,47 +1,66 @@
-"""
-Download all RFSD parquet files (2011-2025) from Hugging Face into data/RFSD.
-Super laconic, fast multi-threaded download using huggingface_hub.
-"""
-import sys
+"""Download pinned sources, or verify an existing local copy."""
 
-# Ensure UTF-8 output on Windows console
-if sys.platform == "win32":
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-    if hasattr(sys.stderr, "reconfigure"):
-        sys.stderr.reconfigure(encoding="utf-8")
-
+import argparse
+import shutil
+import urllib.request
 from pathlib import Path
-from huggingface_hub import snapshot_download
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from firm_level.dataset import DATA_DIR
+from firm_level.sources import SOURCES, verify_file
 
-def main():
-    print(f"Target data directory: {DATA_DIR}")
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
-    print("Starting download of RFSD dataset (2011-2025)...")
-    downloaded_path = snapshot_download(
-        repo_id="irlspbru/RFSD",
-        repo_type="dataset",
-        allow_patterns="RFSD/**/*.parquet",
-        local_dir=str(DATA_DIR),
-        max_workers=4,
-    )
-    print(f"Downloaded files to: {downloaded_path}")
-    
-    # List downloaded parquet files and their sizes
-    rfsd_dir = DATA_DIR / "RFSD"
-    files = sorted(rfsd_dir.glob("year=*/part-0.parquet"))
-    total_bytes = 0
-    print("\nSummary of local RFSD parquet partitions:")
-    print("-" * 45)
-    for f in files:
-        size_mb = f.stat().st_size / (1024 * 1024)
-        total_bytes += f.stat().st_size
-        print(f"  {f.parent.name:<12} | {size_mb:>7.1f} MB | {f.name}")
-    print("-" * 45)
-    print(f"Total: {len(files)} partitions, {total_bytes / (1024**3):.2f} GB\n")
+
+def download_rosstat(directory: Path, verify_only: bool = False) -> None:
+    for name, meta in SOURCES["rosstat"].items():
+        path = directory / name
+        if path.exists() or verify_only:
+            verify_file(path, meta["sha256"])
+            continue
+        temporary = path.with_suffix(".download")
+        request = urllib.request.Request(meta["url"], headers={"User-Agent": "RFSD research"})
+        try:
+            # Default HTTPS certificate and hostname verification stays enabled.
+            with urllib.request.urlopen(request, timeout=60) as response, temporary.open("wb") as stream:
+                shutil.copyfileobj(response, stream)
+            verify_file(temporary, meta["sha256"])
+            temporary.replace(path)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+
+def download_rfsd(directory: Path, verify_only: bool = False) -> None:
+    meta = SOURCES["rfsd"]
+    missing = []
+    for name, spec in meta["files"].items():
+        path = directory / name
+        if path.exists() or verify_only:
+            verify_file(path, spec["sha256"])
+        else:
+            missing.append(name)
+    if missing:
+        from huggingface_hub import snapshot_download
+
+        snapshot_download(
+            repo_id=meta["repo_id"], repo_type="dataset", revision=meta["revision"],
+            allow_patterns=missing, local_dir=directory, max_workers=4,
+        )
+        for name in missing:
+            verify_file(directory / name, meta["files"][name]["sha256"])
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source", choices=["rfsd", "rosstat", "all"], default="rfsd")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument("--verify-only", action="store_true", help="No network access; check local SHA256")
+    args = parser.parse_args()
+    if not args.verify_only:
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+    if args.source in {"rfsd", "all"}:
+        download_rfsd(args.data_dir, args.verify_only)
+    if args.source in {"rosstat", "all"}:
+        download_rosstat(args.data_dir, args.verify_only)
+    print(f"Verified {args.source}: {args.data_dir}")
+
 
 if __name__ == "__main__":
     main()

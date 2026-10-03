@@ -1,29 +1,28 @@
 [project]
 name = "firm-level"
 version = "0.1.0"
-description = "Add your description here"
+description = "Local RFSD queries with Polars"
 readme = "README.md"
 authors = [
     { name = "Denis", email = "deniskrylovvit@gmail.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
-    "huggingface-hub>=2.0.0",
-    "matplotlib>=3.11.2",
-    "openpyxl>=3.1.5",
     "polars>=1.44.2",
-    "pyarrow>=25.0.1",
-    "xlrd>=2.0.2",
 ]
-
-[project.scripts]
-firm-level = "firm_level.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.7,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
+download = ["huggingface-hub>=2.0.0"]
+analysis = ["openpyxl>=3.1.5"]
 dev = [
+    { include-group = "analysis" },
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires the local RFSD and Rosstat source files"]

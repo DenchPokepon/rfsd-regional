@@ -1,51 +1,51 @@
-"""
-RFSD Data Access Module.
-Pure, native Polars LazyFrame interface with zero bloat.
-"""
+"""Local RFSD access. scan_rfsd returns an unfiltered Polars LazyFrame."""
+
+import os
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
+
 import polars as pl
 
-# Project root and data directories
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = Path(os.environ.get("RFSD_DATA_DIR", PROJECT_ROOT / "data"))
 RFSD_DIR = DATA_DIR / "RFSD"
-NAMES_DICT_PATH = DATA_DIR / "descriptive_names_dict.csv"
+NAMES_DICT_PATH = Path(__file__).with_name("descriptive_names.csv")
 
-# Far Eastern Federal District (ДФО) identifiers
-DFO_REGIONS = [
-    "amur",
-    "buryatia",
-    "jewish ao",
-    "zabaikalsk terr.",
-    "kamchatka",
-    "magadan",
-    "primorsky terr.",
-    "sakhalin",
-    "yakutia",
-    "khabarovsk",
-    "chukotka",
-]
+# tax region -> (RFSD region label, Rosstat region label)
+DFO = {
+    "0300": ("buryatia", "Республика Бурятия"),
+    "1400": ("yakutia", "Республика Саха (Якутия)"),
+    "2500": ("primorsky terr.", "Приморский край"),
+    "2700": ("khabarovsk", "Хабаровский край"),
+    "2800": ("amur", "Амурская область"),
+    "4100": ("kamchatka", "Камчатский край"),
+    "4900": ("magadan", "Магаданская область"),
+    "6500": ("sakhalin", "Сахалинская область"),
+    "7500": ("zabaikalsk terr.", "Забайкальский край"),
+    "7900": ("jewish ao", "Еврейская автономная область"),
+    "8700": ("chukotka", "Чукотский автономный округ"),
+}
+DFO_TAXCODES = list(DFO)
+DFO_REGIONS = [names[0] for names in DFO.values()]
 
-DFO_TAXCODES = [
-    "0300",  # Республика Бурятия
-    "1400",  # Республика Саха (Якутия)
-    "2500",  # Приморский край
-    "2700",  # Хабаровский край
-    "2800",  # Амурская область
-    "4100",  # Камчатский край
-    "4900",  # Магаданская область
-    "6500",  # Сахалинская область
-    "7500",  # Забайкальский край
-    "7900",  # Еврейская автономная область
-    "8700",  # Чукотский автономный округ
-]
+
+def region_code() -> pl.Expr:
+    """Tax region takes precedence; only an empty code permits label fallback."""
+    code = pl.col("region_taxcode").str.strip_chars()
+    return (
+        pl.when(code.is_not_null() & (code != ""))
+        .then(pl.when(code.str.contains(r"^\d{4}$")).then(code))
+        .otherwise(pl.col("region").replace_strict(
+            {names[0]: tax for tax, names in DFO.items()}, default=None,
+        ))
+    )
+
+
+def dfo_filter() -> pl.Expr:
+    return region_code().is_in(DFO_TAXCODES).fill_null(False)
 
 
 def load_renaming_dict() -> dict[str, str]:
-    """Load mapping of raw column names (line_XXXX) to descriptive names."""
-    if not NAMES_DICT_PATH.exists():
-        return {}
     df = pl.read_csv(NAMES_DICT_PATH)
     return dict(zip(df["original"], df["descriptive"]))
 
@@ -55,62 +55,27 @@ def scan_rfsd(
     descriptive: bool = False,
     data_dir: Path | str | None = None,
 ) -> pl.LazyFrame:
-    """
-    Return a native Polars LazyFrame over RFSD partitioned parquet files.
-
-    Parameters
-    ----------
-    year : int | Sequence[int] | None
-        Specific year (e.g. 2024) or sequence of years to scan.
-    descriptive : bool
-        If True, renames accounting line items (line_2110 -> PL_revenue, etc.)
-    data_dir : Path | str | None
-        Optional custom directory containing RFSD partitioned parquet files.
-    """
-    base_dir = Path(data_dir) if data_dir else RFSD_DIR
-    pattern = str(base_dir / "**" / "*.parquet")
-    
-    lf = pl.scan_parquet(pattern, hive_partitioning=True)
-    
-    if year is not None:
-        if isinstance(year, int) and not isinstance(year, bool):
-            lf = lf.filter(pl.col("year") == year)
-        elif isinstance(year, Sequence) and not isinstance(year, (str, bytes)):
-            if not all(isinstance(y, int) and not isinstance(y, bool) for y in year):
-                invalid_types = [type(y).__name__ for y in year if not isinstance(y, int) or isinstance(y, bool)]
-                raise TypeError(
-                    f"All elements in 'year' sequence must be integers without implicit casting. "
-                    f"Found invalid types: {invalid_types}"
-                )
-            lf = lf.filter(pl.col("year").is_in(list(year)))
-        else:
-            raise TypeError(
-                f"'year' must be an int or Sequence[int] (no implicit casting allowed), "
-                f"got {type(year).__name__}: {year!r}"
-            )
-            
+    """Read all downloaded years, or exactly the requested partitions."""
+    base = Path(data_dir) if data_dir is not None else RFSD_DIR
+    if year is None:
+        files = sorted(base.glob("year=*/*.parquet"))
+    else:
+        years = [year] if type(year) is int else year
+        if (not isinstance(years, Sequence) or isinstance(years, (str, bytes))
+                or not years or any(type(y) is not int for y in years)):
+            raise TypeError("year must be an int or a nonempty sequence of ints")
+        files = []
+        for y in sorted(set(years)):
+            partition = sorted((base / f"year={y}").glob("*.parquet"))
+            if not partition:
+                raise FileNotFoundError(f"Missing RFSD year={y} in {base}")
+            files.extend(partition)
+    if not files:
+        raise FileNotFoundError(
+            f"No RFSD partitions in {base}. Run uv run --group download python scripts/download_data.py"
+        )
+    lf = pl.scan_parquet(files, hive_partitioning=True)
     if descriptive:
-        renames = load_renaming_dict()
-        if renames:
-            schema_cols = set(lf.collect_schema().names())
-            valid_renames = {k: v for k, v in renames.items() if k in schema_cols and k != v}
-            # Verify no duplicate targets in valid_renames
-            seen_targets: set[str] = set()
-            duplicate_targets: set[str] = set()
-            for target in valid_renames.values():
-                if target in seen_targets:
-                    duplicate_targets.add(target)
-                seen_targets.add(target)
-            if duplicate_targets:
-                raise ValueError(
-                    f"Cannot apply descriptive renames because target column names are duplicated: "
-                    f"{sorted(duplicate_targets)}"
-                )
-            lf = lf.rename(valid_renames)
-            
+        names = lf.collect_schema().names()
+        lf = lf.rename({k: v for k, v in load_renaming_dict().items() if k in names})
     return lf
-
-
-def dfo_filter() -> pl.Expr:
-    """Return a native Polars expression filtering for DFO companies."""
-    return pl.col("region").is_in(DFO_REGIONS) | pl.col("region_taxcode").is_in(DFO_TAXCODES)
