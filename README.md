@@ -15,6 +15,8 @@ uv run --locked --group download python scripts/download_data.py --source all
 uv run --locked python -i explore.py
 ```
 
+Если Python 3.11 уже установлен, первую команду можно пропустить. При сбое установки или обнаружения версии укажите рабочий интерпретатор явно: `uv sync --locked --all-groups --python "путь/к/python.exe"`.
+
 RFSD занимает около 7,7 ГБ. Загрузчик скачивает отсутствующие файлы, проверяет SHA-256 и использует фиксированную ревизию. Имеющиеся файлы другой версии не перезаписываются молча. Проверка без сети:
 
 ```sh
@@ -76,34 +78,49 @@ uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py
 [Короткая инструкция](docs/audit_task.md) · [Распределение, Excel и охват](docs/audit_packet.md).
 
 ```sh
-uv run --locked python scripts/prepare_audit.py --audit-run outputs/runs/20261003-batch3-audit --figures-run outputs/runs/20261003-batch5-figures-v2
+uv run --locked python scripts/prepare_audit.py --audit-run outputs/reproduce/audit --figures-run outputs/reproduce/figures --output-dir outputs/reproduce/packet
 ```
 
-Скрипт на Polars воспроизводит списки и шаблоны ответа CSV, историю ИНН, отраслевые таблицы, копии задания и графиков. Отдельные Excel для пяти коллег лежат в сохранённом комплекте; Python-команда создаёт CSV/Parquet. Ответы коллег сохраняйте отдельно от индексированных исходных выгрузок.
+Сначала выполните расчёты и графики по последовательности ниже. Скрипт на Polars воспроизводит списки и шаблоны ответа CSV, историю ИНН, отраслевые таблицы, копии задания и графиков. Отдельные Excel для пяти коллег лежат в сохранённом комплекте; Python-команда создаёт CSV/Parquet. Ответы коллег сохраняйте отдельно от индексированных исходных выгрузок.
 
 ## Общие графики
 
 После проверки и сравнения укажите каталоги сохранённых запусков:
 
 ```sh
-uv run --locked --group plots python scripts/plot_results.py --audit-run outputs/runs/20261003-batch3-audit --comparison-run outputs/runs/20261003-batch4-comparison-v2
+uv run --locked --group plots python scripts/plot_results.py --audit-run outputs/reproduce/audit --comparison-run outputs/reproduce/comparison --output-dir outputs/reproduce/figures
 ```
 
 Четыре PNG/SVG и исходные таблицы сохраняются в новый индексируемый каталог. Входные хеши, ревизия RFSD, ручные исключения и общие суммы должны совпадать. [Графики и пояснения](docs/figures.md). При ручной очистке сначала пересчитайте оба входных запуска с одним `--decisions`.
 
-## Проверки и воспроизводимость
+## Полный повтор в новом клоне
+
+После установки и загрузки данных выполните команды по порядку. Каталоги `outputs/reproduce/` ниже должны быть новыми; для следующего повтора замените этот префикс во всех командах. Старые результаты не удаляются и не перезаписываются.
+
+```sh
+uv run --locked python scripts/download_data.py --source all --verify-only
+uv run --locked python scripts/check_data.py --output-dir outputs/reproduce/audit
+uv run --locked python scripts/dfo_analysis.py --year 2024 --top-sectors 15 --top-firms 10 --output-dir outputs/reproduce/dfo
+uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py --output-dir outputs/reproduce/comparison
+uv run --locked --group plots python scripts/plot_results.py --audit-run outputs/reproduce/audit --comparison-run outputs/reproduce/comparison --output-dir outputs/reproduce/figures
+uv run --locked python scripts/prepare_audit.py --audit-run outputs/reproduce/audit --figures-run outputs/reproduce/figures --output-dir outputs/reproduce/packet
+```
+
+Можно использовать проверенную локальную копию источников вместо повторного скачивания: перед запуском задайте `RFSD_DATA_DIR` с путём к каталогу данных. Сохранённые старые запуски для расчёта не требуются. В репозитории Markdown ссылается на исторические результаты: изображения и Excel нужно передать отдельно либо открыть новые файлы в `outputs/reproduce/`. Текст записок не обновляется автоматически при изменении данных или ручных решений.
+
+## Проверки
 
 ```sh
 uv run --locked pytest -q -m "not integration"
 uv run --locked pytest -q -m integration
 ```
 
-Первый набор использует небольшие искусственные данные и не требует скачивания RFSD. Второй проверяет локальные источники и контрольные суммы агрегатов; без данных пропускается. Если Windows блокирует системный temp-каталог, добавьте `--basetemp outputs/pytest-temp`: это служебный каталог, который pytest очищает при запуске.
+Первый набор использует небольшие искусственные данные и не требует скачивания RFSD. Второй проверяет локальные источники и контрольные значения агрегатов; без данных пропускается. Если Windows блокирует системный temp-каталог, добавьте `--basetemp .pytest-temp`: это служебный каталог в корне проекта, который pytest очищает при запуске.
 
-Версии Python и зависимостей закреплены `.python-version` и `uv.lock`; ревизия RFSD, размеры и SHA-256 — в [sources.json](src/firm_level/sources.json). Росстат обновляет файлы по прежним URL: если хеш изменился, загрузчик остановится. Для точного повтора потребуется сохранённая копия либо отдельное согласованное обновление источников и проверок.
+В `.python-version` задана ветка Python 3.11; patch-версия не закреплена. Зависимости закреплены в `uv.lock`; ревизия RFSD, размеры и SHA-256 — в [sources.json](src/firm_level/sources.json). Росстат обновляет файлы по прежним URL: если хеш изменился, загрузчик остановится. Для точного повтора потребуется сохранённая копия либо отдельное согласованное обновление источников и проверок.
 
 Словарь названий в `src/firm_level/descriptive_names.csv` — метаданные схемы, не отчётность компаний. Он перенесён из прежнего проекта и адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv).
 
-Два основных документа — [задание коллегам](docs/audit_task.md) и [краткий анализ RFSD–ВРП](docs/rfsd_vs_rosstat_brief.md). Подробности: [диагностика](docs/data_audit.md), [техническое сравнение с Росстатом](docs/rfsd_vs_rosstat.md), [общие графики](docs/figures.md). Старые документы в `docs/drafts/` сохранены с предупреждением. Сверку первичной отчётности выполняют коллеги; следующий шаг проекта — сквозная проверка воспроизводимости. Все комплекты — в [индексе](docs/results.md).
+Два основных документа — [задание коллегам](docs/audit_task.md) и [краткий анализ RFSD–ВРП](docs/rfsd_vs_rosstat_brief.md). Подробности: [диагностика](docs/data_audit.md), [техническое сравнение с Росстатом](docs/rfsd_vs_rosstat.md), [общие графики](docs/figures.md). Старые документы в `docs/drafts/` сохранены с предупреждением. Сквозной повтор проверен; [комплект передачи и протокол](docs/handoff.md). Следующий шаг — сверка первичной отчётности коллегами. Все комплекты — в [индексе](docs/results.md).
 
 Источник: [RFSD — Bondarkov, Ledenev, Skougarevskiy](https://github.com/irlcode/RFSD), CC BY 4.0. Финансовая отчётность неконсолидированная; юридический адрес не определяет место производства.

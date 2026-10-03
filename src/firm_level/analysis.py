@@ -35,7 +35,7 @@ def read_exclusions(path: Path | None) -> pl.LazyFrame:
     )
     if invalid.height:
         raise ValueError("Invalid decisions: exclusion needs INN, year, reason and source")
-    return df.filter(pl.col("action") == "exclude").select("inn", "year").unique().lazy()
+    return df.filter(pl.col("action") == "exclude").select("inn", "year").unique().sort("inn", "year").lazy()
 
 
 COMMERCIAL = pl.col("okopf").str.contains(r"^[16]\d{4}$").fill_null(False)

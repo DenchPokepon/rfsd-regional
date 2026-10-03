@@ -77,7 +77,9 @@ def main():
     if audit_meta["sources"]["rfsd"] != comparison_meta["sources"]["rfsd"]:
         raise ValueError("RFSD source versions differ")
     audit_run = json.loads((args.audit_run / "run.json").read_text(encoding="utf-8"))
-    if audit_run["manual_exclusions"] != comparison_meta["metadata"]["manual_exclusions"]:
+    audit_exclusions = {(r["inn"], r["year"]) for r in audit_run["manual_exclusions"]}
+    comparison_exclusions = {(r["inn"], r["year"]) for r in comparison_meta["metadata"]["manual_exclusions"]}
+    if audit_exclusions != comparison_exclusions:
         raise ValueError("Manual exclusions differ between runs")
     if audit_run["years"] != list(range(2011, 2026)):
         raise ValueError("Coverage figures require all 2011–2025 years")

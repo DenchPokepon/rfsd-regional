@@ -97,3 +97,12 @@ def test_checksum_rejects_modified_input(tmp_path):
     path.write_bytes(b"changed")
     with pytest.raises(ValueError, match="mismatch"):
         verify_file(path, sha)
+
+
+def test_manual_exclusions_have_stable_order_and_no_duplicates(tmp_path):
+    path = tmp_path / "decisions.csv"
+    path.write_text("inn,year,action,reason,source\n"
+                    "9999999999,2025,exclude,error,report\n"
+                    "0123456789,2024,exclude,error,report\n"
+                    "0123456789,2024,exclude,error,report\n", encoding="utf-8")
+    assert read_exclusions(path).collect().rows() == [("0123456789", 2024), ("9999999999", 2025)]

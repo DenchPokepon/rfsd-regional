@@ -98,6 +98,8 @@ def main():
     if file_hash(args.audit_run / "manifest.json") not in linked_hashes:
         raise ValueError("Figures were not built from this audit run")
     run = json.loads((args.audit_run / "run.json").read_text(encoding="utf-8"))
+    if run["years"] != list(range(2011, 2026)):
+        raise ValueError("Audit packet requires diagnostics for all 2011–2025 years")
     exclusions = pl.DataFrame(run["manual_exclusions"], schema={"inn": pl.String, "year": pl.Int64})
     for key, info in SOURCES["rfsd"]["files"].items():
         verify_file(DATA_DIR / key, info["sha256"])
