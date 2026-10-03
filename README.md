@@ -2,7 +2,7 @@
 
 Python 3.11, uv, Parquet. `scan_rfsd()` возвращает обычный LazyFrame без скрытых фильтров; можно также использовать `pl.scan_parquet()` напрямую.
 
-[План и статусы](docs/plan.md) · [Правила расчётов](docs/analysis_rules.md) · [Индекс результатов](docs/results.md)
+[Задание коллегам](docs/audit_task.md) · [Краткий анализ RFSD–ВРП](docs/rfsd_vs_rosstat_brief.md) · [План и статусы](docs/plan.md) · [Правила расчётов](docs/analysis_rules.md) · [Индекс результатов](docs/results.md)
 
 ## Установка и данные
 
@@ -104,6 +104,6 @@ uv run --locked pytest -q -m integration
 
 Словарь названий в `src/firm_level/descriptive_names.csv` — метаданные схемы, не отчётность компаний. Он перенесён из прежнего проекта и адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv).
 
-Актуальны [задание коллегам](docs/audit_task.md), [диагностика RFSD](docs/data_audit.md), [справочное сравнение с Росстатом](docs/rfsd_vs_rosstat.md) и [общие графики](docs/figures.md). Старые документы в `docs/drafts/` сохранены с предупреждением. Сверку кандидатов по первичной отчётности выполняют коллеги; краткая итоговая редакция анализа — следующий шаг плана. Все комплекты — в [индексе](docs/results.md).
+Два основных документа — [задание коллегам](docs/audit_task.md) и [краткий анализ RFSD–ВРП](docs/rfsd_vs_rosstat_brief.md). Подробности: [диагностика](docs/data_audit.md), [техническое сравнение с Росстатом](docs/rfsd_vs_rosstat.md), [общие графики](docs/figures.md). Старые документы в `docs/drafts/` сохранены с предупреждением. Сверку первичной отчётности выполняют коллеги; следующий шаг проекта — сквозная проверка воспроизводимости. Все комплекты — в [индексе](docs/results.md).
 
 Источник: [RFSD — Bondarkov, Ledenev, Skougarevskiy](https://github.com/irlcode/RFSD), CC BY 4.0. Финансовая отчётность неконсолидированная; юридический адрес не определяет место производства.
