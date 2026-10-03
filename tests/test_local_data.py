@@ -6,7 +6,7 @@ import pytest
 from firm_level import dfo_filter, scan_rfsd
 from firm_level.analysis import BASE, CLEAN, REVENUE, observed_sum
 from firm_level.dataset import DATA_DIR, RFSD_DIR
-from firm_level.rosstat import read_grp, read_gva
+from firm_level.rosstat import read_grp, read_gva, read_comparison_details
 
 pytestmark = pytest.mark.integration
 
@@ -34,3 +34,19 @@ def test_pinned_rosstat_totals():
     assert grp.filter(pl.col("year") == 2011)["grp_bln"].sum() == pytest.approx(2890.0653)
     assert grp.filter(pl.col("year") == 2024)["grp_bln"].sum() == pytest.approx(11769.9991)
     assert gva.filter(pl.col("year") == 2024)["gva_bln"].sum() == pytest.approx(11769.9991, abs=0.001)
+
+
+def test_pinned_rosstat_indices_and_housing():
+    if not (DATA_DIR / "VRP_OKVED2_s_2016.xlsx").exists():
+        pytest.skip("Download Rosstat files to run the local integration checks")
+    details = read_comparison_details(DATA_DIR / "VRP_s1998.xlsx", DATA_DIR / "VRP_OKVED2_s_2016.xlsx")
+    volumes = details["volume_indices"]
+    assert volumes.height == 248
+    assert volumes.filter((pl.col("group") == "DFO") & (pl.col("year") == 2024))["volume_factor"].item() == 1.042
+    # Preserve the anomalous source zero; growth calculations must not use it as a deflator.
+    assert volumes.filter((pl.col("group") == "S") & (pl.col("year") == 2019))["volume_factor"].item() == 0
+    housing = details["housing"].filter((pl.col("region_code") == "DFO") & (pl.col("year") == 2024))
+    assert housing["housing_bln"].item() == pytest.approx(513.5449899)
+    gva = details["regional_gva"].filter(pl.col("year") == 2024)
+    total = gva.filter(pl.col("region_code") == "DFO")["gva_bln"].sum()
+    assert total == pytest.approx(gva.filter(pl.col("region_code") != "DFO")["gva_bln"].sum(), abs=.001)

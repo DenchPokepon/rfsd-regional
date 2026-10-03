@@ -14,6 +14,7 @@ from firm_level.analysis import (
 )
 from firm_level.diagnostics import AUDIT_METRICS, BUCKET, adjacent_panel, anomaly_candidates, changes
 from firm_level.sources import SOURCES, verify_file
+from firm_level.results import create_run, finish_run
 
 FIELDS = ["line_1100", "line_1200", "line_1230", "line_1240", "line_1300", "line_1600",
           "line_1700", "line_2100", "line_2110", "line_2120", "line_2200", "line_2400"]
@@ -24,7 +25,7 @@ COLUMNS = ["inn", "year", "region", "region_taxcode", "okopf", "okved", "okved_s
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--years", type=int, nargs="+")
-    parser.add_argument("--output-dir", type=Path, default=Path("outputs/checks"))
+    parser.add_argument("--output-dir", type=Path, help="New directory; existing runs are never overwritten")
     parser.add_argument("--decisions", type=Path)
     parser.add_argument("--top", type=int, default=20, help="Candidates per year and reason")
     parser.add_argument("--trace-inn", nargs="+", default=[], help="Optional firm histories, across all Russia")
@@ -34,6 +35,7 @@ def main() -> None:
     years = sorted(set(args.years or [int(p.name[5:]) for p in RFSD_DIR.glob("year=*") if p.is_dir()]))
     if not years:
         raise FileNotFoundError(f"No RFSD partitions in {RFSD_DIR}")
+    args.output_dir = create_run("audit", args.output_dir)
     exclusions = read_exclusions(args.decisions).collect().with_columns(pl.lit(True).alias("manual_exclusion"))
     tables = {name: [] for name in ["coverage", "groups", "flags", "selection", "forms", "geography",
                                     "anomalies", "adjacent_growth", "changes", "transitions", "hospital",
@@ -139,7 +141,6 @@ def main() -> None:
                                          .with_columns(pl.lit(reason).alias("reason"), pl.lit(year).alias("comparison_year")))
         previous = df
         print(f"Checked {year}: {df.height:,} DFO firm-years", flush=True)
-    args.output_dir.mkdir(parents=True, exist_ok=True)
     for name, frames in tables.items():
         if frames:
             result = pl.concat(frames, how="vertical_relaxed")
@@ -149,14 +150,11 @@ def main() -> None:
             result = result.sort(sort_cols, nulls_last=True)
             result.write_csv(args.output_dir / f"{name}.csv")
             result.write_parquet(args.output_dir / f"{name}.parquet")
-        else:
-            # A one-year run must not leave an old adjacent-year table behind.
-            for extension in ["csv", "parquet"]:
-                (args.output_dir / f"{name}.{extension}").unlink(missing_ok=True)
     metadata = {"years": years, "rfsd_revision": SOURCES["rfsd"]["revision"], "hashes_verified": True,
                 "top_per_reason_year": args.top, "trace_inn": args.trace_inn,
                 "manual_exclusions": exclusions.select("inn", "year").to_dicts()}
     (args.output_dir / "run.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    finish_run(args.output_dir, "audit", metadata)
     print(f"Wrote {args.output_dir}")
 
 
