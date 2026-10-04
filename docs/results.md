@@ -4,7 +4,7 @@
 
 | Материал | Описание | Файлы |
 |---|---|---|
-| Определения | [Выборка и показатели](analysis_rules.md) | [Версии источников](../src/firm_level/sources.json) |
+| Определения | [Выборка и показатели](analysis_rules.md) | [Версии источников](../src/rfsd_regional/sources.json) |
 | Проверка RFSD | [Покрытие, динамика, аномалии](data_audit.md) | Таблицы (`outputs/runs/20261003-batch3-audit`) |
 | Сравнение с Росстатом | [Подробные результаты](rfsd_vs_rosstat.md) | Таблицы (`outputs/runs/20261003-batch4-comparison-v2`) |
 | Графики | [Четыре рисунка с пояснениями](figures.md) | PNG, SVG и таблицы (`outputs/runs/20261003-batch5-figures-v2`) |

@@ -105,7 +105,7 @@
 
 [Росстат, ВРП](https://rosstat.gov.ru/storage/mediabank/VRP_s1998.xlsx): листы 1–2 — номинальные уровни в млн руб., лист 6 — индексы объёма. Сноски листов 2 и 13 относятся соответственно к производственному ряду и источникам доходов.
 
-[Росстат, отрасли](https://rosstat.gov.ru/storage/mediabank/VRP_OKVED2_s_2016.xlsx): `2.год` — номинальная ВДС в тыс. руб., `1. год` — индексы объёма, `2.2024!P91` — жилищные услуги. Версии локальных файлов зафиксированы в [sources.json](../src/firm_level/sources.json).
+[Росстат, отрасли](https://rosstat.gov.ru/storage/mediabank/VRP_OKVED2_s_2016.xlsx): `2.год` — номинальная ВДС в тыс. руб., `1. год` — индексы объёма, `2.2024!P91` — жилищные услуги. Версии локальных файлов зафиксированы в [sources.json](../src/rfsd_regional/sources.json).
 
 ```sh
 uv run --locked --group analysis python scripts/rfsd_rosstat_pipeline.py
