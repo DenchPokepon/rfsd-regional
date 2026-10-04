@@ -1,26 +1,26 @@
 # RFSD: данные и код для исследования экономики ДФО
 
-Мы используем отчётность компаний для анализа отраслей и региональной динамики. Здесь собраны локальная база, простые Polars-запросы и первые расчёты.
+Мы используем отчётность компаний для анализа отраслей и региональной динамики. Здесь собраны простые Polars-запросы и первые расчёты. Базу скачиваем отдельно.
 
 [С чего предлагаем начать](docs/audit_task.md) · [Сравнение с ВРП](docs/rfsd_vs_rosstat_brief.md) · [Excel для разбора компаний](docs/audit_packet.md) · [Открытые вопросы](docs/plan.md)
 
 ## Установка и данные
 
-Из корня репозитория, с установленным [uv](https://docs.astral.sh/uv/getting-started/installation/):
+Скачиваем репозиторий через Git или **Code → Download ZIP**, открываем терминал в его корне. С установленным [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```sh
 uv python install 3.11
-uv sync --locked --all-groups
-uv run --locked --group download python scripts/download_data.py --source all
-uv run --locked python -i explore.py
+uv sync --locked --no-default-groups --group download
+uv run --locked --no-default-groups --group download python scripts/download_data.py
+uv run --locked --no-default-groups python -i explore.py
 ```
 
-Если Python 3.11 уже установлен, первую команду можно пропустить. При проблемах с обнаружением версии можно указать интерпретатор явно: `uv sync --locked --all-groups --python "путь/к/python.exe"`.
+Если Python 3.11 уже установлен, первую команду можно пропустить. При проблемах с обнаружением версии можно указать интерпретатор явно: `uv sync --locked --python "путь/к/python.exe"`.
 
 RFSD занимает около 7,7 ГБ. Загрузчик использует фиксированную ревизию и проверяет SHA-256. Проверка имеющихся файлов без сети:
 
 ```sh
-uv run --locked python scripts/download_data.py --source all --verify-only
+uv run --locked python scripts/download_data.py --verify-only
 ```
 
 Данные лежат в `data/`, результаты — в `outputs/runs/`; оба каталога вне Git. Другой каталог данных можно задать через `RFSD_DATA_DIR`: он должен содержать `RFSD/` и файлы Росстата. Аргумент `scan_rfsd(data_dir=...)` принимает сам каталог с партициями `year=...`.
@@ -81,9 +81,11 @@ uv run --locked python scripts/dfo_analysis.py --year 2024 --top-sectors 15 --to
 
 ## Полный повтор в новом клоне
 
-После установки окружения и загрузки данных:
+После установки RFSD добавляем зависимости для расчётов и скачиваем Росстат:
 
 ```sh
+uv sync --locked --all-groups
+uv run --locked python scripts/download_data.py --source rosstat
 uv run --locked python scripts/download_data.py --source all --verify-only
 uv run --locked python scripts/check_data.py --output-dir outputs/reproduce/audit
 uv run --locked python scripts/dfo_analysis.py --year 2024 --top-sectors 15 --top-firms 10 --output-dir outputs/reproduce/dfo
@@ -94,14 +96,14 @@ uv run --locked python scripts/prepare_audit.py --audit-run outputs/reproduce/au
 
 Для следующего повтора меняем префикс `outputs/reproduce/` во всех командах. Можно использовать проверенную локальную копию источников через `RFSD_DATA_DIR`, без повторного скачивания. При ручных исключениях проверку RFSD и сравнение с Росстатом выполняем с одним файлом `--decisions`, затем строим графики.
 
-Python-команды создают CSV/Parquet, а генератор графиков — PNG/SVG. Готовые XLSX экспортированы отдельно и доступны в [материалах для коллег](docs/audit_packet.md). Для работы с ними весь набор расчётов повторять не нужно.
+Python-команды создают CSV/Parquet, а генератор графиков — PNG/SVG. Готовые XLSX экспортированы отдельно и лежат в [материалах для коллег](docs/audit_packet.md); повторный запуск создаёт шаблоны в CSV. Для работы с готовыми файлами скачивать базу и запускать код не нужно.
 
-Числа в записках и ссылки на графики относятся к сохранённым результатам. Новый запуск не переписывает документы автоматически. Текущие материалы перечислены в [индексе](docs/results.md).
+Числа в записках, графики в `docs/figures/` и Excel в `docs/materials/` относятся к расчёту от 03.10.2026. Они входят в репозиторий. Новый запуск не переписывает документы автоматически. Текущие материалы перечислены в [индексе](docs/results.md).
 
 ## Проверки и версии
 
 ```sh
-uv run --locked pytest -q -m "not integration"
+uv run --locked --group plots pytest -q -m "not integration"
 uv run --locked pytest -q -m integration
 ```
 

@@ -5,21 +5,21 @@
 | Материал | Описание | Файлы |
 |---|---|---|
 | Определения | [Выборка и показатели](analysis_rules.md) | [Версии источников](../src/firm_level/sources.json) |
-| Проверка RFSD | [Покрытие, динамика, аномалии](data_audit.md) | [Таблицы](../outputs/runs/20261003-batch3-audit/) |
-| Сравнение с Росстатом | [Подробные результаты](rfsd_vs_rosstat.md) | [Таблицы](../outputs/runs/20261003-batch4-comparison-v2/) |
-| Графики | [Четыре рисунка с пояснениями](figures.md) | [PNG, SVG и таблицы](../outputs/runs/20261003-batch5-figures-v2/) |
-| Компании для разбора | [Содержание Excel](audit_packet.md) | [Excel и выгрузки](../outputs/runs/20261003-batch6-audit-v2/) |
-| Краткое сравнение с ВРП | [Текущая записка](rfsd_vs_rosstat_brief.md) | [Редакция и сверка чисел от 03.10.2026](../outputs/runs/20261003-batch7-brief/) |
-| Повтор расчётов | [Описание проверки](handoff.md#воспроизводимость) | [Логи и протоколы](../outputs/runs/20261003-batch8-handoff/) |
+| Проверка RFSD | [Покрытие, динамика, аномалии](data_audit.md) | Таблицы (`outputs/runs/20261003-batch3-audit`) |
+| Сравнение с Росстатом | [Подробные результаты](rfsd_vs_rosstat.md) | Таблицы (`outputs/runs/20261003-batch4-comparison-v2`) |
+| Графики | [Четыре рисунка с пояснениями](figures.md) | PNG, SVG и таблицы (`outputs/runs/20261003-batch5-figures-v2`) |
+| Компании для разбора | [Содержание Excel](audit_packet.md) | Excel и выгрузки (`outputs/runs/20261003-batch6-audit-v2`) |
+| Краткое сравнение с ВРП | [Текущая записка](rfsd_vs_rosstat_brief.md) | Редакция и сверка чисел от 03.10.2026 (`outputs/runs/20261003-batch7-brief`) |
+| Повтор расчётов | [Описание проверки](handoff.md#воспроизводимость) | Логи и протоколы (`outputs/runs/20261003-batch8-handoff`) |
 
-Данные и выгрузки храним вне Git, поэтому клонирование репозитория не переносит их на другой компьютер. Можно скопировать готовые результаты или повторить расчёты по [README](../README.md).
+Пути `outputs/` в таблице относятся к локальному архиву автора и не входят в репозиторий. Для нового расчёта используем команды из [README](../README.md). Четыре рисунка и стартовые Excel доступны сразу в [docs/figures](figures/) и [docs/materials](materials/).
 
-У каждого запуска есть `manifest.json` с параметрами, версиями источников и контрольными суммами файлов. Все успешные запуски автоматически попадают в [машинный индекс](../outputs/index.json). Parquet сохраняет типы ИНН и кодов; CSV удобен для обмена.
+У каждого запуска есть `manifest.json` с параметрами, версиями источников и контрольными суммами файлов. Все успешные запуски автоматически попадают в машинный индекс (`outputs/index.json`). Parquet сохраняет типы ИНН и кодов; CSV удобен для обмена.
 
 ## Прежние версии
 
 Старые результаты сохранены для сравнения. Они не заменяют таблицы, перечисленные выше.
 
-- Первые расчёты: [сравнение с ВРП](../outputs/runs/20261003-batch2-comparison/), [отрасли и крупнейшие компании](../outputs/runs/20261003-batch2-dfo/).
-- [Ранние черновики](drafts/) и [архив до исправлений](../outputs/runs/20261003-legacy-unverified/) содержат известные ошибки.
-- Проверочный повтор в отдельном клоне: [диагностика](../outputs/runs/20261003-batch8-reproduce-audit/), [отрасли](../outputs/runs/20261003-batch8-reproduce-dfo/), [Росстат](../outputs/runs/20261003-batch8-reproduce-comparison/), [графики](../outputs/runs/20261003-batch8-reproduce-figures/), [списки компаний](../outputs/runs/20261003-batch8-reproduce-packet/).
+- Первые расчёты: сравнение с ВРП (`outputs/runs/20261003-batch2-comparison`), отрасли и крупнейшие компании (`outputs/runs/20261003-batch2-dfo`).
+- [Ранние черновики](drafts/) и архив до исправлений (`outputs/runs/20261003-legacy-unverified`) содержат известные ошибки.
+- Проверочный повтор в отдельном клоне: диагностика (`outputs/runs/20261003-batch8-reproduce-audit`), отрасли (`outputs/runs/20261003-batch8-reproduce-dfo`), Росстат (`outputs/runs/20261003-batch8-reproduce-comparison`), графики (`outputs/runs/20261003-batch8-reproduce-figures`), списки компаний (`outputs/runs/20261003-batch8-reproduce-packet`).

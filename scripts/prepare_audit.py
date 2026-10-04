@@ -171,7 +171,7 @@ def main():
         shutil.copy2(args.figures_run / f"{stem}.png", output / f"{stem}.png")
     task = (PROJECT_ROOT / "docs/audit_task.md").read_text(encoding="utf-8")
     for stem in ["01_coverage", "04_concentration_cleaning"]:
-        task = task.replace(f"../outputs/runs/20261003-batch5-figures-v2/{stem}.png", f"{stem}.png")
+        task = task.replace(f"figures/{stem}.png", f"{stem}.png")
     (output / "audit_task.md").write_text(task, encoding="utf-8")
     metadata = {"year": 2024, "hashes_verified": True, "manual_exclusions": run["manual_exclusions"],
                 "audit_run": str(args.audit_run), "audit_manifest_sha256": file_hash(args.audit_run / "manifest.json"),

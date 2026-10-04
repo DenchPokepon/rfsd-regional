@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -28,14 +29,16 @@ def finish_run(path: Path, label: str, metadata: dict) -> None:
     path = path.resolve()
     code = [*PROJECT_ROOT.glob("scripts/*.py"), *PROJECT_ROOT.glob("src/firm_level/*.py"),
             PROJECT_ROOT / "uv.lock", PROJECT_ROOT / "docs/analysis_rules.md"]
-    ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT,
-                         capture_output=True, text=True, check=False)
-    status = subprocess.run(["git", "status", "--porcelain"], cwd=PROJECT_ROOT,
-                            capture_output=True, text=True, check=False)
+    ref = status = None
+    if shutil.which("git"):
+        ref = subprocess.run(["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT,
+                             capture_output=True, text=True, check=False)
+        status = subprocess.run(["git", "status", "--porcelain"], cwd=PROJECT_ROOT,
+                                capture_output=True, text=True, check=False)
     manifest = {
         "label": label, "saved_utc": datetime.now(timezone.utc).isoformat(),
-        "git_head": ref.stdout.strip() if ref.returncode == 0 else None,
-        "git_worktree_dirty": bool(status.stdout.strip()) if status.returncode == 0 else None,
+        "git_head": ref.stdout.strip() if ref and ref.returncode == 0 else None,
+        "git_worktree_dirty": bool(status.stdout.strip()) if status and status.returncode == 0 else None,
         "python": sys.version.split()[0], "command": ["python", *sys.argv],
         "metadata": metadata, "sources": SOURCES,
         "code_sha256": {p.relative_to(PROJECT_ROOT).as_posix(): file_hash(p) for p in code if p.is_file()},

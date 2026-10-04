@@ -66,3 +66,15 @@ def test_result_runs_refuse_overwrite_and_index_actual_hashes(tmp_path, monkeypa
     (path / "table.csv").write_text("x\n2\n", encoding="utf-8")
     with pytest.raises(ValueError, match="changed"):
         results.finish_run(path, "test", {})
+
+
+def test_results_can_be_saved_without_git(tmp_path, monkeypatch):
+    monkeypatch.setattr(results, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(results.shutil, "which", lambda _: None)
+    path = results.create_run("zip", tmp_path / "run")
+    (path / "table.csv").write_text("x\n1\n", encoding="utf-8")
+    results.finish_run(path, "zip", {})
+    manifest = json.loads((path / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["git_head"] is None
+    assert manifest["git_worktree_dirty"] is None
+    assert manifest["files"]["table.csv"]["sha256"] == results.file_hash(path / "table.csv")
