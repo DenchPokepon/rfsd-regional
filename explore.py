@@ -4,8 +4,8 @@ import sys
 
 import polars as pl
 
-from firm_level import dfo_filter, scan_rfsd
-from firm_level.analysis import BASE, CLEAN, CLUSTER, GROSS_PROFIT, REVENUE, SECTION
+from rfsd_regional import dfo_filter, scan_rfsd
+from rfsd_regional.analysis import BASE, CLEAN, CLUSTER, GROSS_PROFIT, REVENUE, SECTION
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")

@@ -3,12 +3,12 @@ from pathlib import Path
 import polars as pl
 import pytest
 
-from firm_level import dfo_filter, scan_rfsd
-from firm_level.analysis import (
+from rfsd_regional import dfo_filter, scan_rfsd
+from rfsd_regional.analysis import (
     BASE, CLEAN, CLUSTER, GROSS_PROFIT, OKVED_CLASS, REVENUE, SECTION,
     SIMPLIFIED_RESULT, observed_sum, read_exclusions,
 )
-from firm_level.sources import verify_file
+from rfsd_regional.sources import verify_file
 
 
 def test_region_precedence_and_missing_values():

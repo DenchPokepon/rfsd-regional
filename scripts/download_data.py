@@ -5,8 +5,8 @@ import shutil
 import urllib.request
 from pathlib import Path
 
-from firm_level.dataset import DATA_DIR
-from firm_level.sources import SOURCES, verify_file
+from rfsd_regional.dataset import DATA_DIR
+from rfsd_regional.sources import SOURCES, verify_file
 
 
 def download_rosstat(directory: Path, verify_only: bool = False) -> None:

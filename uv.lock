@@ -88,41 +88,6 @@ wheels = [
 ]
 
 [[package]]
-name = "firm-level"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "polars" },
-]
-
-[package.dev-dependencies]
-analysis = [
-    { name = "openpyxl" },
-]
-dev = [
-    { name = "openpyxl" },
-    { name = "pytest" },
-]
-download = [
-    { name = "huggingface-hub" },
-]
-plots = [
-    { name = "matplotlib" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "polars", specifier = ">=1.44.2" }]
-
-[package.metadata.requires-dev]
-analysis = [{ name = "openpyxl", specifier = ">=3.1.5" }]
-dev = [
-    { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pytest", specifier = ">=9.1.1" },
-]
-download = [{ name = "huggingface-hub", specifier = ">=2.0.0" }]
-plots = [{ name = "matplotlib", specifier = ">=3.10" }]
-
-[[package]]
 name = "fonttools"
 version = "4.66.1"
 source = { registry = "https://pypi.org/simple" }
@@ -465,6 +430,41 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/45/91/47a6e1c42d9ee337c4839208f30d9f09caa9f720ec7582917b264defc875/pyyaml-6.0.3-cp311-cp311-win32.whl", hash = "sha256:8098f252adfa6c80ab48096053f512f2321f0b998f98150cea9bd23d83e1467b", size = 142543, upload-time = "2025-09-25T21:32:08.95Z" },
     { url = "https://files.pythonhosted.org/packages/da/e3/ea007450a105ae919a72393cb06f122f288ef60bba2dc64b26e2646fa315/pyyaml-6.0.3-cp311-cp311-win_amd64.whl", hash = "sha256:9f3bfb4965eb874431221a3ff3fdcddc7e74e3b07799e0e84ca4a0f867d449bf", size = 158763, upload-time = "2025-09-25T21:32:09.96Z" },
 ]
+
+[[package]]
+name = "rfsd-regional"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "polars" },
+]
+
+[package.dev-dependencies]
+analysis = [
+    { name = "openpyxl" },
+]
+dev = [
+    { name = "openpyxl" },
+    { name = "pytest" },
+]
+download = [
+    { name = "huggingface-hub" },
+]
+plots = [
+    { name = "matplotlib" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "polars", specifier = ">=1.44.2" }]
+
+[package.metadata.requires-dev]
+analysis = [{ name = "openpyxl", specifier = ">=3.1.5" }]
+dev = [
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pytest", specifier = ">=9.1.1" },
+]
+download = [{ name = "huggingface-hub", specifier = ">=2.0.0" }]
+plots = [{ name = "matplotlib", specifier = ">=3.10" }]
 
 [[package]]
 name = "six"

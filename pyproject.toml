@@ -1,7 +1,7 @@
 [project]
-name = "firm-level"
+name = "rfsd-regional"
 version = "0.1.0"
-description = "Local RFSD queries with Polars"
+description = "Regional analytics on RFSD with Polars"
 readme = "README.md"
 authors = [
     { name = "Denis", email = "deniskrylovvit@gmail.com" }

@@ -7,11 +7,11 @@ import shutil
 
 import polars as pl
 
-from firm_level import scan_rfsd, dfo_filter, region_code
-from firm_level.analysis import BASE, CLEAN, CLUSTER, DIVISION, REVENUE, SUMMARY
-from firm_level.dataset import DATA_DIR, PROJECT_ROOT
-from firm_level.results import create_run, file_hash, finish_run
-from firm_level.sources import SOURCES, verify_file
+from rfsd_regional import scan_rfsd, dfo_filter, region_code
+from rfsd_regional.analysis import BASE, CLEAN, CLUSTER, DIVISION, REVENUE, SUMMARY
+from rfsd_regional.dataset import DATA_DIR, PROJECT_ROOT
+from rfsd_regional.results import create_run, file_hash, finish_run
+from rfsd_regional.sources import SOURCES, verify_file
 
 # Group, reviewer, number of head firms in the first pass. Ten remain available.
 BLOCKS = [

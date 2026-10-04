@@ -1,8 +1,8 @@
 import openpyxl
 import pytest
 
-from firm_level.dataset import DFO
-from firm_level.rosstat import read_grp, read_gva
+from rfsd_regional.dataset import DFO
+from rfsd_regional.rosstat import read_grp, read_gva
 
 
 def test_grp_sums_regions_and_rejects_an_incomplete_workbook(tmp_path):

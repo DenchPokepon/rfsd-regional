@@ -3,10 +3,10 @@
 import polars as pl
 import pytest
 
-from firm_level import dfo_filter, scan_rfsd
-from firm_level.analysis import BASE, CLEAN, REVENUE, observed_sum
-from firm_level.dataset import DATA_DIR, RFSD_DIR
-from firm_level.rosstat import read_grp, read_gva, read_comparison_details
+from rfsd_regional import dfo_filter, scan_rfsd
+from rfsd_regional.analysis import BASE, CLEAN, REVENUE, observed_sum
+from rfsd_regional.dataset import DATA_DIR, RFSD_DIR
+from rfsd_regional.rosstat import read_grp, read_gva, read_comparison_details
 
 pytestmark = pytest.mark.integration
 

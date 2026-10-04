@@ -27,7 +27,7 @@ def file_hash(path: Path) -> str:
 def finish_run(path: Path, label: str, metadata: dict) -> None:
     """Call after successful writes. An unfinished directory is not indexed."""
     path = path.resolve()
-    code = [*PROJECT_ROOT.glob("scripts/*.py"), *PROJECT_ROOT.glob("src/firm_level/*.py"),
+    code = [*PROJECT_ROOT.glob("scripts/*.py"), *PROJECT_ROOT.glob("src/rfsd_regional/*.py"),
             PROJECT_ROOT / "uv.lock", PROJECT_ROOT / "docs/analysis_rules.md"]
     ref = status = None
     if shutil.which("git"):

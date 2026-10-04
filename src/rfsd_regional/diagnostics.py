@@ -2,7 +2,7 @@
 
 import polars as pl
 
-from firm_level.analysis import (
+from rfsd_regional.analysis import (
     BASE, CLEAN, COMMERCIAL, NONFINANCIAL, BALANCE_GAP, PROFIT_GAP, REVENUE,
     finite, observed_sum,
 )

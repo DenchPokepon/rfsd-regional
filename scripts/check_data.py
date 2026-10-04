@@ -6,15 +6,15 @@ from pathlib import Path
 
 import polars as pl
 
-from firm_level import dfo_filter, scan_rfsd
-from firm_level.dataset import DFO, RFSD_DIR, region_code
-from firm_level.analysis import (
+from rfsd_regional import dfo_filter, scan_rfsd
+from rfsd_regional.dataset import DFO, RFSD_DIR, region_code
+from rfsd_regional.analysis import (
     BASE, CLEAN, REVENUE, SUMMARY, SECTION, CLUSTER, BALANCE_GAP, PROFIT_GAP,
     observed_sum, finite, read_exclusions,
 )
-from firm_level.diagnostics import AUDIT_METRICS, BUCKET, adjacent_panel, anomaly_candidates, changes
-from firm_level.sources import SOURCES, verify_file
-from firm_level.results import create_run, finish_run
+from rfsd_regional.diagnostics import AUDIT_METRICS, BUCKET, adjacent_panel, anomaly_candidates, changes
+from rfsd_regional.sources import SOURCES, verify_file
+from rfsd_regional.results import create_run, finish_run
 
 FIELDS = ["line_1100", "line_1200", "line_1230", "line_1240", "line_1300", "line_1600",
           "line_1700", "line_2100", "line_2110", "line_2120", "line_2200", "line_2400"]

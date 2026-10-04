@@ -5,12 +5,12 @@ from pathlib import Path
 
 import polars as pl
 
-from firm_level import dfo_filter, region_code, scan_rfsd
-from firm_level.analysis import (
+from rfsd_regional import dfo_filter, region_code, scan_rfsd
+from rfsd_regional.analysis import (
     BASE, CLEAN, CLUSTER, OKVED_CLASS, REVENUE, SECTION, SUMMARY,
     read_exclusions,
 )
-from firm_level.results import create_run, finish_run
+from rfsd_regional.results import create_run, finish_run
 
 
 def main() -> None:

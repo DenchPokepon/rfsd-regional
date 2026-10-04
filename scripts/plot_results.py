@@ -11,7 +11,7 @@ from matplotlib.patches import Patch
 from matplotlib.ticker import FuncFormatter
 import polars as pl
 
-from firm_level.results import create_run, file_hash, finish_run
+from rfsd_regional.results import create_run, file_hash, finish_run
 
 BLUE, TEAL, ORANGE, GREY = "#244C70", "#187E80", "#C96E32", "#82909D"
 SECTORS = {

@@ -3,8 +3,8 @@ import json
 import polars as pl
 import pytest
 
-from firm_level.comparison import add_growth, correlations
-from firm_level import results
+from rfsd_regional.comparison import add_growth, correlations
+from rfsd_regional import results
 
 
 def test_growth_requires_adjacent_year_and_positive_base():

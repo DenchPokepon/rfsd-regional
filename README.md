@@ -34,8 +34,8 @@ uv run --locked python scripts/download_data.py --verify-only
 `scan_rfsd()` возвращает обычный LazyFrame без скрытых фильтров. Можно использовать и `pl.scan_parquet()` напрямую.
 
 ```python
-from firm_level import scan_rfsd, dfo_filter
-from firm_level.analysis import BASE, CLEAN, REVENUE, observed_sum
+from rfsd_regional import scan_rfsd, dfo_filter
+from rfsd_regional.analysis import BASE, CLEAN, REVENUE, observed_sum
 import polars as pl
 
 # Сырые данные по всей России, включая непредставивших отчётность.
@@ -109,6 +109,6 @@ uv run --locked pytest -q -m integration
 
 Первый набор работает на небольших искусственных данных, второй проверяет локальные источники и контрольные значения; без источников он пропускается. Если Windows блокирует системный temp-каталог, можно добавить `--basetemp .pytest-temp`. Pytest очищает этот служебный каталог при запуске.
 
-Python 3.11 указан в `.python-version`, зависимости — в `uv.lock`. Ревизия RFSD и SHA-256 исходников сохранены в [sources.json](src/firm_level/sources.json). Файлы Росстата могут меняться по прежним URL; при несовпадении хеша загрузчик останавливается. Для точного повтора используем сохранённые копии.
+Python 3.11 указан в `.python-version`, зависимости — в `uv.lock`. Ревизия RFSD и SHA-256 исходников сохранены в [sources.json](src/rfsd_regional/sources.json). Файлы Росстата могут меняться по прежним URL; при несовпадении хеша загрузчик останавливается. Для точного повтора используем сохранённые копии.
 
-[Словарь названий](src/firm_level/descriptive_names.csv) адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv). Результаты нашего повтора расчётов в отдельном окружении описаны [здесь](docs/handoff.md#воспроизводимость).
+[Словарь названий](src/rfsd_regional/descriptive_names.csv) адаптирован из [словаря RFSD](https://github.com/irlcode/RFSD/blob/main/aux_data/descriptive_names_dict.csv). Результаты нашего повтора расчётов в отдельном окружении описаны [здесь](docs/handoff.md#воспроизводимость).

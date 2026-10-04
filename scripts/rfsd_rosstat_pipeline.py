@@ -5,16 +5,16 @@ from pathlib import Path
 
 import polars as pl
 
-from firm_level import dfo_filter, region_code, scan_rfsd
-from firm_level.analysis import (
+from rfsd_regional import dfo_filter, region_code, scan_rfsd
+from rfsd_regional.analysis import (
     BASE, CLEAN, SECTION, SUMMARY, REVENUE, read_exclusions,
 )
-from firm_level.dataset import DATA_DIR
-from firm_level.diagnostics import adjacent_panel
-from firm_level.comparison import add_growth, add_deflated_growth, correlations
-from firm_level.rosstat import read_grp, read_gva, read_comparison_details
-from firm_level.sources import SOURCES, verify_file
-from firm_level.results import create_run, finish_run
+from rfsd_regional.dataset import DATA_DIR
+from rfsd_regional.diagnostics import adjacent_panel
+from rfsd_regional.comparison import add_growth, add_deflated_growth, correlations
+from rfsd_regional.rosstat import read_grp, read_gva, read_comparison_details
+from rfsd_regional.sources import SOURCES, verify_file
+from rfsd_regional.results import create_run, finish_run
 
 METRICS = ['revenue_bln', 'gross_profit_full_bln', 'simplified_result_bln']
 

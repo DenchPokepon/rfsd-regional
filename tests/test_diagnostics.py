@@ -1,7 +1,7 @@
 import polars as pl
 import pytest
 
-from firm_level.diagnostics import BUCKET, adjacent_panel, changes
+from rfsd_regional.diagnostics import BUCKET, adjacent_panel, changes
 
 
 def panel(year, revenues, regions, sections):
