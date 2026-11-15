@@ -17,7 +17,10 @@ build-backend = "uv_build"
 
 [dependency-groups]
 download = ["huggingface-hub>=2.0.0"]
-analysis = ["openpyxl>=3.1.5"]
+analysis = [
+    "openpyxl>=3.1.5",
+    "xlsxwriter>=3.2.9",
+]
 plots = ["matplotlib>=3.10"]
 dev = [
     { include-group = "analysis" },
@@ -27,3 +30,4 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["integration: requires the local RFSD and Rosstat source files"]
+addopts = "--basetemp=outputs/pytest-tmp"

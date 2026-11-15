@@ -28,6 +28,89 @@ DFO = {
 DFO_TAXCODES = list(DFO)
 DFO_REGIONS = [names[0] for names in DFO.values()]
 
+SKFO = {
+    "0500": ("dagestan", "Республика Дагестан"),
+    "0600": ("ingushetia", "Республика Ингушетия"),
+    "0700": ("kabardino-balkaria", "Кабардино-Балкарская Республика"),
+    "0900": ("karachaevo-chercessia", "Карачаево-Черкесская Республика"),
+    "1500": ("north ossetia", "Республика Северная Осетия - Алания"),
+    "2000": ("chechnya", "Чеченская Республика"),
+    "2600": ("stavropol", "Ставропольский край"),
+}
+
+YUFO = {
+    "0100": ("adygeya", "Республика Адыгея"),
+    "0800": ("kalmykia", "Республика Калмыкия"),
+    "2300": ("krasnodar", "Краснодарский край"),
+    "3000": ("astrakhan", "Астраханская область"),
+    "3400": ("volgograd", "Волгоградская область"),
+    "6100": ("rostov", "Ростовская область"),
+    "9100": ("crimea", "Республика Крым"),
+    "9200": ("sevastopol", "г. Севастополь"),
+}
+
+SFO = {
+    "0400": ("altai rep.", "Республика Алтай"),
+    "1700": ("tuva", "Республика Тыва"),
+    "1900": ("khakasia", "Республика Хакасия"),
+    "2200": ("altai terr.", "Алтайский край"),
+    "2400": ("krasnoyarsk", "Красноярский край"),
+    "3800": ("irkutsk", "Иркутская область"),
+    "4200": ("kemerovo", "Кемеровская область - Кузбасс"),
+    "5400": ("novosibirsk", "Новосибирская область"),
+    "5500": ("omsk", "Омская область"),
+    "7000": ("tomsk", "Томская область"),
+}
+
+SZFO = {
+    "1000": ("karelia", "Республика Карелия"),
+    "1100": ("komi", "Республика Коми"),
+    "2900": ("arkhangelsk", "Архангельская область"),
+    "2983": ("nenets ao", "Ненецкий автономный округ"),
+    "3500": ("vologda", "Вологодская область"),
+    "3900": ("kaliningrad", "Калининградская область"),
+    "4700": ("leningrad", "Ленинградская область"),
+    "5100": ("murmansk", "Мурманская область"),
+    "5300": ("novgorod", "Новгородская область"),
+    "6000": ("pskov", "Псковская область"),
+    "7800": ("sankt-petersburg", "г. Санкт-Петербург"),
+}
+
+FEDERAL_DISTRICTS = {
+    "DFO": {
+        "name": "Дальневосточный федеральный округ",
+        "short_name": "ДФО",
+        "regions": DFO,
+    },
+    "SKFO": {
+        "name": "Северо-Кавказский федеральный округ",
+        "short_name": "СКФО",
+        "regions": SKFO,
+    },
+    "YUFO": {
+        "name": "Южный федеральный округ",
+        "short_name": "ЮФО",
+        "regions": YUFO,
+    },
+    "SFO": {
+        "name": "Сибирский федеральный округ",
+        "short_name": "СФО",
+        "regions": SFO,
+    },
+    "SZFO": {
+        "name": "Северо-Западный федеральный округ",
+        "short_name": "СЗФО",
+        "regions": SZFO,
+    },
+}
+
+ALL_DISTRICT_REGIONS = {}
+for _fo_info in FEDERAL_DISTRICTS.values():
+    ALL_DISTRICT_REGIONS.update(_fo_info["regions"])
+
+# Combined label fallback dictionary
+REGION_LABEL_TO_TAX = {names[0]: tax for tax, names in ALL_DISTRICT_REGIONS.items()}
+
 
 def region_code() -> pl.Expr:
     """Tax region takes precedence; only an empty code permits label fallback."""
@@ -35,10 +118,17 @@ def region_code() -> pl.Expr:
     return (
         pl.when(code.is_not_null() & (code != ""))
         .then(pl.when(code.str.contains(r"^\d{4}$")).then(code))
-        .otherwise(pl.col("region").replace_strict(
-            {names[0]: tax for tax, names in DFO.items()}, default=None,
-        ))
+        .otherwise(pl.col("region").replace_strict(REGION_LABEL_TO_TAX, default=None))
     )
+
+
+def district_filter(district_key: str) -> pl.Expr:
+    """Filter by federal district (DFO, SKFO, YUFO, SFO, SZFO)."""
+    key = district_key.upper()
+    if key not in FEDERAL_DISTRICTS:
+        raise KeyError(f"Unknown district {district_key}. Choices: {list(FEDERAL_DISTRICTS)}")
+    taxcodes = list(FEDERAL_DISTRICTS[key]["regions"])
+    return region_code().is_in(taxcodes).fill_null(False)
 
 
 def dfo_filter() -> pl.Expr:
